@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="container my-5">
+  <div class="row p-4 align-items-center rounded-3 border shadow-lg">
+    <div class="">
+      <p class="lead">Select modification sites <span id="entry_name"></span> </p>
+    </div>
+
+    <div style="overflow-wrap: break-word;" id="sequence-viewer">
+    </div>
+
+
+    </div>
+  </div>
+</div>
+
+<script >
+  var entry_object =  JSON.parse('{{entry_dict | tojson | safe}}');
+  var protein_agent = new ptmprofiler.protein_agent(entry_object);
+  var sequence_viewer = new ptmprofiler.sequence_viewer(protein_agent, "sequence-viewer");
+  sequence_viewer.draw();
+</script>
+
+<div class="container my-5">
+  <div class="row p-4 align-items-center rounded-3 border shadow-lg">
+    <div class="">
+      <p class="lead">reSMALI - SH2 domain prediction </p>
+    </div>
+
+    <div style="overflow-wrap: break-word;" id="sequence-viewer">
+    </div>
+
+
+    </div>
+  </div>
+</div>
+
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+function go_to_profiler(){
+
+  var select_residues = [];
+
+  for(var i =0; i < protein_agent.protein_length; i++){
+    if(protein_agent.selected[i]){
+      select_residues.push(i);
+    }
+  }
+  sessionStorage.setItem("selected_residues", JSON.stringify(select_residues));
+  sessionStorage.setItem("uniprot_id", protein_agent.entry);
+  window.location.assign('../ptm_profile/');
+
+
+}
+</script>
+
+<div style="background-color: aliceblue;" class="fixed-bottom modal-footer"> <button type="button" class="btn btn-success" onclick="go_to_profiler()" >Continue -></button></div>
+
+{% endblock %}

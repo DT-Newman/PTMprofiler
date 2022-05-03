@@ -1,0 +1,2 @@
+﻿function,url,description,usage
+,/api/search_protein/<SEARCH TERM>,Searches the currently loaded swissprot database for entries based on ma,

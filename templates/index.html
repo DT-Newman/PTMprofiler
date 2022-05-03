@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script>
+    function protsearch(str) {
+        document.getElementById("livesearch").innerHTML='it works';
+        jQuery.getJSON('http://127.0.0.1:8000/api/search_protein/'+str, function(data) {
+          var keys = Object.keys(data.Entry);
+          var output = "";
+          for(var i = 0; i < keys.length; i++){
+            output = output + "<a href=\"./profile/" + data.Entry[keys[i]]  +"\">" + "<b>" + data.Entry[keys[i]] + "</b> - " + data['Entry name'][keys[i]] + " - <i>" + data['Gene names'][keys[i]] +   "</i></a></br>";
+          }
+          document.getElementById("livesearch").innerHTML = output;
+          document.getElementById("livesearch").style.border="1px solid #A5ACB2";
+        }
+        );
+
+    }
+</script>
+
+
+<div class="container my-5">
+  <div class="row p-4 align-items-center rounded-3 border shadow-lg">
+    <div class="">
+      <p class="lead">Welcome to PTM profiler, search for your protein of interest below to get started</p>
+    </div>
+
+    <div class="row justify-content-md-center">
+      <div class="col-lg-6">
+      <input type="search" id="form1" class="form-control" placeholder="Enter gene name or uniprot id" onkeyup="protsearch(this.value)" />
+      <div id="livesearch">nothing to show</div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
