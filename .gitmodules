@@ -1,0 +1,3 @@
+[submodule "ptmprofiler/reSMALI"]
+	path = ptmprofiler/reSMALI
+	url = https://github.com/DT-Newman/reSMALI
