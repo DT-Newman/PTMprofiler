@@ -22,6 +22,12 @@
   var protein_agent = new ptmprofiler.protein_agent(entry_object);
   var sequence_viewer = new ptmprofiler.sequence_viewer(protein_agent, "sequence-viewer");
   sequence_viewer.draw();
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+
+
 </script>
 
 <div class="container my-5">
@@ -29,8 +35,10 @@
     <div class="">
       <p class="lead">reSMALI - SH2 domain prediction </p>
     </div>
+    <div> <button type="button" class="btn btn-outline-success" onclick="getSMALI()" >Get reSMALI</button></div>
 
-    <div style="overflow-wrap: break-word;" id="sequence-viewer">
+    <div style="overflow-wrap: break-word;" id="resmali-info">
+
     </div>
 
 
@@ -38,10 +46,35 @@
   </div>
 </div>
 
+
 <script>
-$(function () {
+
+  function getSMALI(){
+  jQuery.getJSON('http://127.0.0.1:8000/api/resmali/condensed/'+protein_agent.sequence, function(data) {
+    output = ""
+    jQuery.each(data, function(key, value){
+      if(protein_agent.selected[(parseInt(key))]){
+      output += key + ": " + value + "<br/>";
+      }
+
+
+    });
+
+
+
+    document.getElementById("resmali-info").innerHTML = output;
+    
+
+  });
+
+  $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
+  
+}
+</script>
+
+<script>
 
 function go_to_profiler(){
 
@@ -60,6 +93,5 @@ function go_to_profiler(){
 }
 </script>
 
-<div style="background-color: aliceblue;" class="fixed-bottom modal-footer"> <button type="button" class="btn btn-success" onclick="go_to_profiler()" >Continue -></button></div>
 
 {% endblock %}

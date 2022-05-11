@@ -1,6 +1,7 @@
 #PYTHON IMPORTS
 
 #THIRD PARTY IMPORTS
+import json
 from urllib import response
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -14,9 +15,10 @@ from fastapi import Request
 import numpy as np
 import pandas as pd
 
+
 #LOCAL IMPORTS
 from ptmprofiler import uniprot
-
+from ptmprofiler.reSMALI import reSMALI
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -59,4 +61,16 @@ def select_phosphosites(request: Request, entry: str):
 def protein_search(search):
      result = uniprot_human.loc[(uniprot_human['Gene names'].str.contains(search, regex=False, case=False)) | (uniprot_human['Entry'].str.contains(search, regex=False, case=False)) ]
      return jsonable_encoder(result.head(10).to_dict())
+
+
+#RESMALI
+
+@app.get('/api/resmali/condensed/{sequence}')
+def resmali_condensed(sequence):
+    result = reSMALI.condensedList(sequence)
+    result_dict = dict()
+    for item in result:
+        result_dict[str(item[0])] = item[1]
+
+    return jsonable_encoder(result_dict)
 
