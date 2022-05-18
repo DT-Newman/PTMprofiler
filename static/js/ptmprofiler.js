@@ -1,7 +1,45 @@
-
-
-
+let enabled_resides = ["Y"];
 var ptmprofiler = {
+    
+    phosphosite : class{
+        
+        constructor(entry){
+            this.entry = entry;
+
+        }
+        show_data(htmlclass, protein_agent){
+            
+            jQuery.getJSON('http://127.0.0.1:8000/api/phosphosite/'+this.entry, function(data) {
+            var output = "<table class=\"table\"><thead><tr>";
+            output += "<th scope=\"col\">#</th>";
+            output += "<th scope=\"col\">Sequence</th>";
+            output += "<th scope=\"col\">Total</th>";
+            output += "<th scope=\"col\">htp</th>";
+            output += "<th scope=\"col\">ltp</th>";
+            output += "<th scope=\"col\">Action</th></tr></thead><tbody>";
+            console.log(data);
+            jQuery.each(data, function(key, value){
+
+                var curresidue = value['ID'].charAt(0);
+                var residue_position = value['ID'].substring(1);
+
+                if(enabled_resides.includes(curresidue)){
+                    output += "<tr>";
+                    output += "<th scope=\"row\">"+ value['ID'] + "</th>";
+                    output += "<td>"+ value['NMER'] + "</td>";
+                    output += "<td>"+ (value['HTP'] + value['LTP']) + "</td>";
+                    output += "<td>"+ value['HTP'] + "</td>";
+                    output += "<td>"+ value['LTP'] + "</td>"; 
+                    output += "<td>" + " <button type=\"button\" class=\"btn btn-outline-success\""+ "onclick=\"sequence_viewer.select_residue("+ (residue_position-1) + ") \""  +">Select</button> <button type=\"button\" class=\"btn btn-outline-danger\"  "+ "onclick=\"sequence_viewer.deselect_residue("+ (residue_position-1) + ") \""  +">Remove</button>" + "</td></tr>";
+                }
+        
+            });
+            output += "</tbody></table>";
+            document.getElementById("phosphosite-viewer").innerHTML = output;
+        });
+        }
+    },
+
     protein_agent : class{
         constructor(entry_object, settings){
             this.entry = entry_object['entry'];
@@ -53,6 +91,18 @@ var ptmprofiler = {
 
         }
 
+        select_residue(residue_number){
+            protein_agent.selected[residue_number] = true;
+            this.highlight_residue(residue_number);
+
+        }
+
+        deselect_residue(residue_number){
+            protein_agent.selected[residue_number] = false;
+            this.highlight_residue(residue_number);
+
+        }
+
         highlight_residue(residue_number){
             if (protein_agent.selected[residue_number]){
                 document.getElementById('seq-view-res-'+residue_number).style = "background-color: red";
@@ -86,7 +136,9 @@ var ptmprofiler = {
 
         }
 
-    }
+    },
+
+
 }
 
 
