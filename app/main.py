@@ -17,9 +17,13 @@ import pandas as pd
 
 
 #LOCAL IMPORTS
-from ptmprofiler import uniprot
+
+
+
+
+import ptmprofiler.uniprot as uniprot
 from ptmprofiler.reSMALI import reSMALI
-from ptmprofiler import phosphosite
+import ptmprofiler.phosphosite as phosphosite
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
