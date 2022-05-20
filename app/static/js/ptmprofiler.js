@@ -9,7 +9,7 @@ var ptmprofiler = {
         }
         show_data(htmlclass, protein_agent){
             
-            jQuery.getJSON('http://127.0.0.1:8000/api/phosphosite/'+this.entry, function(data) {
+            jQuery.getJSON('/api/phosphosite/'+this.entry, function(data) {
             var output = "<table class=\"table\"><thead><tr>";
             output += "<th scope=\"col\">#</th>";
             output += "<th scope=\"col\">Sequence</th>";
