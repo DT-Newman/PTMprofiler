@@ -1,4 +1,6 @@
 #PYTHON IMPORTS
+import sys,os
+
 
 #THIRD PARTY IMPORTS
 import json
@@ -17,13 +19,16 @@ import pandas as pd
 
 
 #LOCAL IMPORTS
+#ensure that PTMprofile is added to the local directory
+absolutepath = os.path.abspath(__file__)
+fileDirectory = os.path.dirname(absolutepath)
+parentDirectory = os.path.dirname(fileDirectory)
+sys.path.append(parentDirectory)
 
-
-
-
-import ptmprofiler.uniprot as uniprot
+from ptmprofiler import uniprot as uniprot
 from ptmprofiler.reSMALI import reSMALI
 import ptmprofiler.phosphosite as phosphosite
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
