@@ -17,7 +17,6 @@ var ptmprofiler = {
             output += "<th scope=\"col\">htp</th>";
             output += "<th scope=\"col\">ltp</th>";
             output += "<th scope=\"col\">Action</th></tr></thead><tbody>";
-            console.log(data);
             jQuery.each(data, function(key, value){
 
                 var curresidue = value['ID'].charAt(0);
@@ -134,6 +133,34 @@ var ptmprofiler = {
             document.getElementById('sequence-viewer').innerHTML = text;
             document.getElementById('entry_name').innerHTML = entry_object['entry'];
 
+        }
+
+    },
+    resmali: class{
+        constructor(protein_agent, htmlclass){
+            this.protein_agent = protein_agent;
+            this.htmlclass = htmlclass;
+            this.output = "";
+        }
+        draw_reSMALI(){
+            var htmlclass = this.htmlclass;
+            var output = "<table class=\"table\"><thead><tr>";
+            output += "<th scope=\"col\">#</th>";
+            output += "<th scope=\"col\">Prediction</th></tr></thead><tbody>";
+
+            
+
+            jQuery.getJSON('/api/resmali/condensed/'+protein_agent.sequence, function(data) {
+                 jQuery.each(data, function(key, value){
+                  if(protein_agent.selected[(parseInt(key))]){
+                    output += "<tr>";
+                    output += "<td>" + (parseInt(key) + 1) + "</td>";
+                    output += "<td>" + value  + "</td></tr>";
+                  }
+                });
+                output += "</tbody></table>";
+                document.getElementById(htmlclass).innerHTML = output;
+            });
         }
 
     },

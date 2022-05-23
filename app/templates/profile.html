@@ -39,9 +39,10 @@
 <div class="container my-5">
   <div class="row p-4 align-items-center rounded-3 border shadow-lg">
     <div class="">
-      <p class="lead">reSMALI - SH2 domain prediction </p>
+      <p class="lead">reSMALI - SH2 domain prediction  <button type="button" class="btn btn-outline-success" onclick="getSMALI()" >Get reSMALI predictions</button></p>
+      reSMALI can be found as standalone python package <a href="https://github.com/DT-Newman/reSMALI">here</a>
+
     </div>
-    <div> <button type="button" class="btn btn-outline-success" onclick="getSMALI()" >Get reSMALI</button></div>
 
     <div style="overflow-wrap: break-word;" id="resmali-info"></div>
 
@@ -74,26 +75,8 @@
 <script>
 
   function getSMALI(){
-  jQuery.getJSON('/api/resmali/condensed/'+protein_agent.sequence, function(data) {
-    output = ""
-    jQuery.each(data, function(key, value){
-      if(protein_agent.selected[(parseInt(key))]){
-      output += key + ": " + value + "<br/>";
-      }
-
-
-    });
-
-
-
-    document.getElementById("resmali-info").innerHTML = output;
-    
-
-  });
-
-  $(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
+  var reSMALI = new ptmprofiler.resmali(protein_agent, "resmali-info");
+  reSMALI.draw_reSMALI();
   
 }
 </script>
