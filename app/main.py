@@ -48,6 +48,10 @@ uniprot_human = pd.read_csv('./data/swiss-prot_human_2021_01.gz', compression='g
 def index(request: Request):
     return templates.TemplateResponse('index.html', {"request": request} )
 
+
+@app.get('/about', response_class=HTMLResponse)
+def about(request: Request):
+    return templates.TemplateResponse('about.html', {"request": request} )
 # #PTMprofile
 # @app.get('/ptm_profile/', response_class=HTMLResponse)
 # def ptm_profile(request: Request):

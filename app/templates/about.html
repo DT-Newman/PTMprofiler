@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row p-4 align-items-center rounded-3 border shadow-lg">
+    <div class="">
+      <p class="lead">About PTM profiler</p>
+    </div>
+    PTMprofiler was created to make all the python scripts that I created for looking at PTM-based predicitions easier to use. PTMprofiler is python based webserver built using fastAPI. While easy to code, no care has been taken to make sure that this package scales well. This tool will probably work well for tens on users at once, but probably will not work well for a large number of users.
+    </div>
+  </div>
+</div>
+
+
+<div class="container my-5">
+  <div class="row p-4 align-items-center rounded-3 border shadow-lg">
+    <div class="">
+      <p class="lead">Phosphosite plus</p>
+    </div>
+
+    Data is webscraped from the phosphosite website. Despite the data being available as download from the authors, at the time of writing this data has not been made available.
+
+    </div>
+  </div>
+</div>
+
+<div class="container my-5">
+  <div class="row p-4 align-items-center rounded-3 border shadow-lg">
+    <div class="">
+      <p class="lead">reSMALI</p>
+      ReSMALI is available as a standalone python package from <a href="https://github.com/DT-Newman/reSMALI">here</a>. SMALI was orignally described in Huang H, Li L, Wu C, et al. Defining the specificity space of the human SRC homology 2 domain. Mol Cell Proteomics. 2008;7(4):768-784. doi:10.1074/mcp.M700312-MCP200 . However the tool is no longer hosted which is why this tool was created. <br/>
+      This tool uses data available in the original papers plus the method described to try and re-create some of the SH3 domain binding predictions made by the original tool.
+
+      The original OPAL arrays upon which the original SMALI tool were not published and are not published. However normalised intensinty values making up 20% or more of the total intensity for a given position were published along with the original tool.
+
+    </div>
+
+   
+    </div>
+  </div>
+</div>
+
+{% endblock %}
