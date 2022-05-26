@@ -70,6 +70,10 @@ var ptmprofiler = {
                 }
             }
         }
+        residue_at_position(position){
+            return this.sequence.charAt(position - 1);
+
+        }
 
 
     },
@@ -231,6 +235,63 @@ var ptmprofiler = {
                 output += "<td>" + value['Group'] + "</td>";
                 output += "<td>" + value['Type'] + "</td>";
                 output += "<td>" + value['Score']   + "</td></tr>";
+              });
+
+
+
+
+            output += "</tbody></table>";
+            document.getElementById(htmlclass).innerHTML = output;
+
+        }
+    },
+
+    networkin: class{
+        constructor(protein_agent, htmlclass){
+            this.protein_agent = protein_agent;
+            this.htmlclass = htmlclass;
+            this.networkin = "";
+        }
+        get_networkin(){
+            var networkin;
+
+            $.ajax({
+                url: '/api/networkin/full/'+protein_agent.entry,
+                async: false,
+                dataType: 'json',
+                success: function(data) {
+                    networkin = JSON.parse(data);
+                    
+                }
+            });
+
+            this.networkin = networkin;
+       
+
+        }
+        draw_networkin(type_list, min_score){
+            var htmlclass = this.htmlclass;
+            var protein_agent = this.protein_agent;
+            var output = "<table class=\"table\"><thead><tr>";
+            output += "<th scope=\"col\">#</th>";
+            output += "<th scope=\"col\">Prediction</th>";
+            output += "<th scope=\"col\">group</th>";
+            output += "<th scope=\"col\">Type</th>";
+            output += "<th scope=\"col\">Score</th></tr></thead><tbody>";
+            jQuery.each(this.networkin, function(key, value){
+                if ((!type_list.includes(value['tree'])) || (value['networkin_score'] < min_score) ) {
+                    return;
+                }
+                if( !protein_agent.selected[value['position'] - 1 ]){
+                    return;
+                }
+
+                output += "<tr>";
+                output += "<td>"+ protein_agent.residue_at_position(value['position']) + value['position']+ "</td>";
+                output += "<td>" + value['id']+ "</td>";
+                output += "<td>" + value['netphorest_group'] + "</td>";
+                output += "<td>" + value['tree'] + "</td>";
+                output += "<td>" + value['networkin_score']   + "</td></tr>";
             
               });
 
@@ -242,7 +303,6 @@ var ptmprofiler = {
 
         }
     }
-
 
 }
 
