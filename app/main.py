@@ -29,6 +29,7 @@ from ptmprofiler import uniprot as uniprot
 from ptmprofiler.reSMALI import reSMALI
 import ptmprofiler.phosphosite as phosphosite
 from ptmprofiler import netphorest as netphorest
+from ptmprofiler import networkin as networkin
 
 
 app = FastAPI()
@@ -42,6 +43,7 @@ print("Starting PTM profiler")
 # Load our databases
 uniprot_human = pd.read_csv('./data/swiss-prot_human_2021_01.gz', compression='gzip', sep='\t')
 netphorest_df = netphorest.load_netphorest("./data/netphorest_human_2.1.tsv.xz")
+networkin_df = networkin.load_networkin("./data/networkin_human_predictions_3.1.tsv.xz")
 
 
 #Homepage
@@ -102,6 +104,13 @@ def resmali_condensed(sequence):
 def netphorest_full(entry):
     string_id = uniprot.get_string_from_entry(entry)
     df = netphorest.get_netphorest(netphorest_df, string_id, "3")
+    return df.to_json(orient='records')
+
+#Netforest
+@app.get('/api/networkin/full/{entry}')
+def networkin_full(entry):
+    string_id = uniprot.get_string_from_entry(entry)
+    df = networkin.get_networkin(networkin_df, string_id)
     return df.to_json(orient='records')
 
 @app.get('/test/{entry}', response_class=HTMLResponse)
