@@ -27,6 +27,12 @@ def get_gene_names_from_db(uniprot_id: str, database: pd.DataFrame) -> list:
   
   return result.iloc[0]['Entry'].split(" ")
 
+def get_string_from_entry(uniprot_id: str) -> str:
+  tree = get_uniprot_entry_xml_tree(uniprot_id)
+  return get_string_id_from_xml_tree(tree)
+
+
+
 
 def get_uniprot_entry_xml_tree(uniprot_id: str) -> ET.ElementTree:
   """ Returns the element tree for a given uniprot entry """
@@ -34,7 +40,7 @@ def get_uniprot_entry_xml_tree(uniprot_id: str) -> ET.ElementTree:
   return ET.ElementTree(fromstring(url))
   return ET.fromstring(url)
 
-def get_uniprot_gene_name__from_xml_tree(tree: ET.ElementTree) -> str:
+def get_uniprot_gene_name_from_xml_tree(tree: ET.ElementTree) -> str:
   """ Returns the primary gene name listed in the element tree """
   #find gene tag
   gene_tag = tree.getroot()[0].find('{http://uniprot.org/uniprot}gene')
@@ -50,6 +56,15 @@ def get_uniprot_gene_name__from_xml_tree(tree: ET.ElementTree) -> str:
 def get_primary_gene_name_from_api(uniprot_id: str) -> str:
   """ Returns the primary gene name for a given uniprot entry """
   tree = get_uniprot_entry_xml_tree(uniprot_id)
-  return get_uniprot_gene_name__from_xml_tree(tree)
+  return get_uniprot_gene_name_from_xml_tree(tree)
+
+def get_string_id_from_xml_tree(tree: ET.ElementTree):
+  root = tree.getroot()[0].findall('{http://uniprot.org/uniprot}dbReference')
+  for child in root:
+    if child.attrib['type'] == "STRING":
+      string = child.attrib['id']
+      return string[string.find(".") + 1:]
+
+  return  "undefined"
 
 

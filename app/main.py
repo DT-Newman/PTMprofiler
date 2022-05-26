@@ -28,6 +28,7 @@ sys.path.append(parentDirectory)
 from ptmprofiler import uniprot as uniprot
 from ptmprofiler.reSMALI import reSMALI
 import ptmprofiler.phosphosite as phosphosite
+from ptmprofiler import netphorest as netphorest
 
 
 app = FastAPI()
@@ -38,8 +39,9 @@ templates = Jinja2Templates(directory="templates")
 
 print("Starting PTM profiler")
 
-# Load our uniprot identifier database
+# Load our databases
 uniprot_human = pd.read_csv('./data/swiss-prot_human_2021_01.gz', compression='gzip', sep='\t')
+netphorest_df = netphorest.load_netphorest("./data/netphorest_human_2.1.tsv.xz")
 
 
 #Homepage
@@ -95,3 +97,21 @@ def resmali_condensed(sequence):
 
     return jsonable_encoder(result_dict)
 
+#Netforest
+@app.get('/api/netphorest/full/{entry}')
+def netphorest_full(entry):
+    string_id = uniprot.get_string_from_entry(entry)
+    df = netphorest.get_netphorest(netphorest_df, string_id, "3")
+    return df.to_json(orient='records')
+
+@app.get('/test/{entry}', response_class=HTMLResponse)
+def test(request: Request, entry: str):
+    entry_dict = {
+         'entry' : entry,
+         'gene_name' : uniprot.get_primary_gene_name_from_api(entry),
+         'sequence' : uniprot.get_main_isoform_sequence(entry),
+     }
+    string_id = uniprot.get_string_from_entry(entry)
+    netphorest.get_netphorest(netphorest_df, string_id, "3")
+    return templates.TemplateResponse('test.html', {"request":request, "entry_dict":jsonable_encoder(entry_dict)})
+    #"gene_name":uniprot.get_primary_gene_name_from_api(entry), "sequence": uniprot.get_main_isoform_sequence(entry)}

@@ -164,6 +164,59 @@ var ptmprofiler = {
         }
 
     },
+    netphorest: class{
+        constructor(protein_agent, htmlclass){
+            this.protein_agent = protein_agent;
+            this.htmlclass = htmlclass;
+            this.netphorest = "";
+        }
+        get_netphorest(){
+            var netphorest;
+
+            $.ajax({
+                url: '/api/netphorest/full/'+protein_agent.entry,
+                async: false,
+                dataType: 'json',
+                success: function(data) {
+                    netphorest = JSON.parse(data);
+                    
+                }
+            });
+
+            this.netphorest = netphorest;
+       
+
+        }
+        draw_netphorest(type_list, min_score){
+            var htmlclass = this.htmlclass;
+            var protein_agent = this.protein_agent 
+            var output = "<table class=\"table\"><thead><tr>";
+            output += "<th scope=\"col\">#</th>";
+            output += "<th scope=\"col\">Prediction</th>";
+            output += "<th scope=\"col\">Type</th>";
+            output += "<th scope=\"col\">Score</th></tr></thead><tbody>";
+            jQuery.each(this.netphorest, function(key, value){
+                if ((!type_list.includes(value['Type'])) || (value['Score'] < min_score) || !protein_agent.selected[value['Position'] - 1]) {
+                    console.log(protein_agent.selected[value['Position']]);
+                    return;
+                }
+
+                output += "<tr>";
+                output += "<td>" + value['Residue'] + value['Position'] + "</td>";
+                output += "<td>" + value['Group'] + "</td>";
+                output += "<td>" + value['Type'] + "</td>";
+                output += "<td>" + value['Score']   + "</td></tr>";
+            
+              });
+
+
+
+
+            output += "</tbody></table>";
+            document.getElementById(htmlclass).innerHTML = output;
+
+        }
+    }
 
 
 }

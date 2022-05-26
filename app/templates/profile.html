@@ -37,6 +37,62 @@
 </div> 
 
 <div class="container my-5">
+  
+  <div class="row p-4 align-items-center rounded-3 border shadow-lg">
+    <div class="">
+      <p class="lead">Netphorest</p>
+    </div>
+
+    <div id="netphorest-controls">
+      
+
+    <div>
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-kin" value="KIN" checked>
+      <label class="form-check-label" for="netphorest-checkbox-kin">KIN</label>
+
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-sh2" value="SH2">
+      <label class="form-check-label" for="netphorest-checkbox-sh2">SH2</label>
+
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-ptp" value="PTP">
+      <label class="form-check-label" for="netphorest-checkbox-ptp">PTP</label>
+
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-ptb" value="PTB">
+      <label class="form-check-label" for="netphorest-checkbox-ptb">PTB</label>
+
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-14" value="14">
+      <label class="form-check-label" for="netphorest-checkbox-14">14-3-3</label>
+
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-brct" value="BRCT">
+      <label class="form-check-label" for="netphorest-checkbox-brct">BRCT</label>
+
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-ww" value="WW">
+      <label class="form-check-label" for="netphorest-checkbox-ww">WW</label>
+
+      <input class="form-check-input" type="checkbox" id="netphorest-checkbox-wd40" value="WD40">
+      <label class="form-check-label" for="netphorest-checkbox-wd40">WD40</label>
+    </div>
+
+    <div>
+      <label for="exampleInputEmail1">Min netphorest score</label>
+      <input type="number" class="form-control" id="netphorest-min-score" placeholder="0.1">
+    
+    </div>
+    <button type="button" class="btn btn-outline-success" onclick="draw_netphorest()" >Get netphorest</button>
+
+
+    </div>
+
+    <div style="overflow-wrap: break-word;" id="netphorest-viewer">
+
+    
+    </div>
+
+   </div>
+
+</div> 
+
+
+<div class="container my-5">
   <div class="row p-4 align-items-center rounded-3 border shadow-lg">
     <div class="">
       <p class="lead">reSMALI - SH2 domain prediction  <button type="button" class="btn btn-outline-success" onclick="getSMALI()" >Get reSMALI predictions</button></p>
@@ -58,6 +114,8 @@
   sequence_viewer.draw(); 
   var phosphosite = new ptmprofiler.phosphosite(entry_object['entry']);
   phosphosite.show_data("phosphosite-viewer");
+  var netphorest = new ptmprofiler.netphorest(protein_agent, "netphorest-viewer");
+  netphorest.get_netphorest();
  
   $(function () {
   $('[data-toggle="tooltip"]').tooltip()
@@ -79,6 +137,20 @@
   reSMALI.draw_reSMALI();
   
 }
+
+function draw_netphorest(){
+    //var nodes = Array.from(document.getElementsByClassName("form-check-input"));
+    var docnodes = document.getElementById('netphorest-controls').getElementsByClassName('form-check-input');
+    var checkedList = [];
+
+    for(let child of docnodes){
+      if(child.checked == 1){
+        checkedList.push(child.value);
+      }
+    }
+    var netphorestMinScore = document.getElementById("netphorest-min-score").value ? document.getElementById("netphorest-min-score").value : 0.1 ;
+    netphorest.draw_netphorest(checkedList, netphorestMinScore);
+  }
 </script>
 
 <script>
