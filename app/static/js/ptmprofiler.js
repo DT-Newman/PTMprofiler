@@ -1,4 +1,4 @@
-let enabled_resides = ["Y"];
+let enabled_resides = ["S", "T","Y"];
 var ptmprofiler = {
     
     phosphosite : class{
@@ -49,7 +49,20 @@ var ptmprofiler = {
     
         }
 
-
+        select_all_S(){
+            for(var i = 0; i < this.protein_length; i++){
+                if(this.sequence.charAt(i) == "S"){
+                    this.selected[i] = true;
+                }
+            }
+        }
+        select_all_T(){
+            for(var i = 0; i < this.protein_length; i++){
+                if(this.sequence.charAt(i) == "T"){
+                    this.selected[i] = true;
+                }
+            }
+        }
         select_all_Y(){
             for(var i = 0; i < this.protein_length; i++){
                 if(this.sequence.charAt(i) == "Y"){
@@ -62,7 +75,7 @@ var ptmprofiler = {
     },
 
     sequence_viewer: class{
-        selectable_residues = ["Y"];
+        selectable_residues = enabled_resides;
         constructor(protein_agent, htmlclass, settings){
             this.sequence = protein_agent.sequence;
             this.residue_number = this.sequence.length;
@@ -73,10 +86,17 @@ var ptmprofiler = {
 
 
 
+        select_all_S(){
+            protein_agent.select_all_S();
+            this.sequence_highlight();
+        }
+        select_all_T(){
+            protein_agent.select_all_T();
+            this.sequence_highlight();
+        }
         select_all_Y(){
             protein_agent.select_all_Y();
             this.sequence_highlight();
-
         }
 
         clear_all(){
@@ -119,7 +139,9 @@ var ptmprofiler = {
         }
 
         draw(){
-            var text = "<button type=\"button\" class=\"btn btn-outline-secondary\" onclick=\"sequence_viewer.select_all_Y()\">Select all Y</button>";
+            var text = "<button type=\"button\" class=\"btn btn-outline-secondary\" onclick=\"sequence_viewer.select_all_S()\">Select all S</button>";
+            text += "<button type=\"button\" class=\"btn btn-outline-secondary\" onclick=\"sequence_viewer.select_all_T()\">Select all T</button>";
+            text += "<button type=\"button\" class=\"btn btn-outline-secondary\" onclick=\"sequence_viewer.select_all_Y()\">Select all Y</button>";
             text += " <button type=\"button\" class=\"btn btn-outline-danger\" onclick=\"sequence_viewer.clear_all()\">Clear all</button>";
             for (var i = 0; i < this.sequence.length; i++){ 
               text += "<a id=\"seq-view-res-" + i +"\" data-toggle=\"tooltip\"" + "title=\"" + this.sequence.charAt(i) + (i+1) + "\" "
@@ -196,8 +218,11 @@ var ptmprofiler = {
             output += "<th scope=\"col\">Type</th>";
             output += "<th scope=\"col\">Score</th></tr></thead><tbody>";
             jQuery.each(this.netphorest, function(key, value){
-                if ((!type_list.includes(value['Type'])) || (value['Score'] < min_score) || !protein_agent.selected[value['Position'] - 1]) {
+                if ((!type_list.includes(value['Type'])) || (value['Score'] < min_score) ) {
                     console.log(protein_agent.selected[value['Position']]);
+                    return;
+                }
+                if( !protein_agent.selected[value['Position'] - 1 ]){
                     return;
                 }
 
