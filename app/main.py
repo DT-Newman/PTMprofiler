@@ -30,6 +30,7 @@ from ptmprofiler.reSMALI import reSMALI
 import ptmprofiler.phosphosite as phosphosite
 from ptmprofiler import netphorest as netphorest
 from ptmprofiler import networkin as networkin
+from ptmprofiler import proteincutter as pc
 
 
 app = FastAPI()
@@ -112,6 +113,12 @@ def networkin_full(entry):
     string_id = uniprot.get_string_from_entry(entry)
     df = networkin.get_networkin(networkin_df, string_id)
     return df.to_json(orient='records')
+
+#Protein cutter
+@app.get('/api/proteincutter/{enzyme}/{sequence}')
+def protein_cutter(enzyme, sequence):
+    peptide_list = pc.get_peptide_list(sequence, enzyme)
+    return jsonable_encoder(peptide_list)
 
 @app.get('/test/{entry}', response_class=HTMLResponse)
 def test(request: Request, entry: str):
