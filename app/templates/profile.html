@@ -24,6 +24,11 @@
       <p class="lead">Phosphosite plus</p>
       Phosphosite entry  is available <a href="http://www.phosphosite.org/uniprotAccAction?id={{entry_dict['entry']}}">here</a>
     </div>
+    <input type='hidden' id='phosphosite-data' value = "" />
+
+    <div = id="phophosite-controls">
+      <div>Select phosphosites with more than LTP: <input type="number" class="form-control  input-sm col-lg-1" id="phosphosite-ltp" placeholder="4"> , HTP: <input type="number" class="form-control" id="phosphosite-htp" placeholder="0"> hits. <button type="button" class="btn btn-outline-success" onclick="select_phosphosites()" >Select sites</button> </div>
+    </div>
 
     <div style="overflow-wrap: break-word;" id="phosphosite-viewer">
 
@@ -152,7 +157,7 @@
   var sequence_viewer = new ptmprofiler.sequence_viewer(protein_agent, "sequence-viewer");
   sequence_viewer.draw(); 
   var phosphosite = new ptmprofiler.phosphosite(entry_object['entry']);
-  phosphosite.show_data("phosphosite-viewer");
+  phosphosite.show_data("phosphosite-viewer", protein_agent);
   var netphorest = new ptmprofiler.netphorest(protein_agent, "netphorest-viewer");
   netphorest.get_netphorest();
   var networkin = new ptmprofiler.networkin(protein_agent, "networkin-viewer");
@@ -164,14 +169,18 @@
 
 
 
-
-
-
-
 </script>
 
 
 <script>
+
+  function select_phosphosites(){
+    var htp = document.getElementById("phosphosite-htp").value;
+    var ltp = document.getElementById("phosphosite-ltp").value;
+
+    phosphosite.select_phosphosites_data(ltp, htp, protein_agent, sequence_viewer);
+
+  }
 
   function getSMALI(){
   var reSMALI = new ptmprofiler.resmali(protein_agent, "resmali-info");

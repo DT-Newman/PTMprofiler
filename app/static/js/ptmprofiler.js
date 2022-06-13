@@ -5,18 +5,26 @@ var ptmprofiler = {
         
         constructor(entry){
             this.entry = entry;
+            this.data = [];
 
         }
         show_data(htmlclass, protein_agent){
-            
-            jQuery.getJSON('/api/phosphosite/'+this.entry, function(data) {
+
+            var exportdata = [];
+
+
+
+            var query = jQuery.getJSON('/api/phosphosite/'+this.entry, function(data) {
             var output = "<table class=\"table\"><thead><tr>";
+            output += "<th scope=\"col\">tp</th>";
             output += "<th scope=\"col\">#</th>";
             output += "<th scope=\"col\">Sequence</th>";
             output += "<th scope=\"col\">Total</th>";
             output += "<th scope=\"col\">htp</th>";
             output += "<th scope=\"col\">ltp</th>";
             output += "<th scope=\"col\">Action</th></tr></thead><tbody>";
+            exportdata = data;
+            console.log(exportdata);
             jQuery.each(data, function(key, value){
 
                 var curresidue = value['ID'].charAt(0);
@@ -24,6 +32,7 @@ var ptmprofiler = {
 
                 if(enabled_resides.includes(curresidue)){
                     output += "<tr>";
+                    output += "<td style=\"background-color:" + protein_agent.typtic_peptide_colors[protein_agent.get_tryptic_peptide_no(residue_position)] +"\">"+ protein_agent.get_tryptic_peptide_no(residue_position) + "</td>";
                     output += "<th scope=\"row\">"+ value['ID'] + "</th>";
                     output += "<td>"+ value['NMER'] + "</td>";
                     output += "<td>"+ (value['HTP'] + value['LTP']) + "</td>";
@@ -35,7 +44,25 @@ var ptmprofiler = {
             });
             output += "</tbody></table>";
             document.getElementById("phosphosite-viewer").innerHTML = output;
+            document.getElementById("phosphosite-data").value = JSON.stringify(data);
+            
         });
+
+        
+        }
+        set_data(data){
+            this.data = data;
+
+        }
+        select_phosphosites_data(ltp, htp,protein_agent, sequence_viewer){
+            console.log(this.data);
+            jQuery.each(this.data, function(key, value){
+                if(value['HTP'] > htp || value['LTP'] > ltp){
+                    protein_agent.selected[value['ID'].substring(1)] = true;
+
+                }
+            });
+            sequence_viewer.draw();
         }
     },
 
@@ -45,7 +72,9 @@ var ptmprofiler = {
             this.sequence = entry_object['sequence'];
             this.protein_length = this.sequence.length;
             this.selected = new Array(this.protein_length);
-            this.selected.fill(false)
+            this.selected.fill(false);
+            this.tryptic_peptides = this.get_tryptic_peptides();
+            this.typtic_peptide_colors = this.get_tryptic_peptide_colors();
     
         }
 
@@ -75,6 +104,45 @@ var ptmprofiler = {
 
         }
 
+        get_tryptic_peptides(){
+            var tryptic_peptides;
+            $.ajax({
+                url: '/api/proteincutter/trypsin/'+this.sequence,
+                async: false,
+                dataType: 'json',
+                success: function(data) {;
+                    tryptic_peptides = data;
+                    
+                }
+            });
+            return tryptic_peptides;
+
+        }
+
+        get_tryptic_peptide_no(position_no){
+            if(this.tryptic_peptides[0] > position_no ){
+                return 1;
+
+            }
+            for(var i=0; i < this.tryptic_peptides.length; i++){
+                if(position_no < this.tryptic_peptides[i]){
+                    return i + 1;
+                }
+
+            }
+            return this.tryptic_peptides.length + 1;
+
+        }
+        get_tryptic_peptide_colors(){
+            var colors = [];
+            for(var i = 0; i < this.tryptic_peptides.length; i++){
+                colors.push('#' + Math.floor(Math.random()*16777215).toString(16));
+
+            }
+            colors.push(colors.push('#' + Math.floor(Math.random()*16777215).toString(16)));
+            return colors;
+        }
+
 
     },
 
@@ -84,6 +152,8 @@ var ptmprofiler = {
             this.sequence = protein_agent.sequence;
             this.residue_number = this.sequence.length;
             this.htmlclass = htmlclass;
+            
+
     
     
         }
@@ -141,6 +211,8 @@ var ptmprofiler = {
             }
 
         }
+
+
 
         draw(){
             var text = "<button type=\"button\" class=\"btn btn-outline-secondary\" onclick=\"sequence_viewer.select_all_S()\">Select all S</button>";
@@ -223,7 +295,6 @@ var ptmprofiler = {
             output += "<th scope=\"col\">Score</th></tr></thead><tbody>";
             jQuery.each(this.netphorest, function(key, value){
                 if ((!type_list.includes(value['Type'])) || (value['Score'] < min_score) ) {
-                    console.log(protein_agent.selected[value['Position']]);
                     return;
                 }
                 if( !protein_agent.selected[value['Position'] - 1 ]){
