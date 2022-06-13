@@ -9,12 +9,7 @@ var ptmprofiler = {
 
         }
         show_data(htmlclass, protein_agent){
-
-            var exportdata = [];
-
-
-
-            var query = jQuery.getJSON('/api/phosphosite/'+this.entry, function(data) {
+            this.data = jQuery.getJSON('/api/phosphosite/'+this.entry, function(data) {
             var output = "<table class=\"table\"><thead><tr>";
             output += "<th scope=\"col\">tp</th>";
             output += "<th scope=\"col\">#</th>";
@@ -23,15 +18,13 @@ var ptmprofiler = {
             output += "<th scope=\"col\">htp</th>";
             output += "<th scope=\"col\">ltp</th>";
             output += "<th scope=\"col\">Action</th></tr></thead><tbody>";
-            exportdata = data;
-            console.log(exportdata);
             jQuery.each(data, function(key, value){
 
                 var curresidue = value['ID'].charAt(0);
                 var residue_position = value['ID'].substring(1);
 
                 if(enabled_resides.includes(curresidue)){
-                    output += "<tr>";
+                    output += "<tr id = \"phosphosite-row-" + (residue_position - 1) +"\">";
                     output += "<td style=\"background-color:" + protein_agent.typtic_peptide_colors[protein_agent.get_tryptic_peptide_no(residue_position)] +"\">"+ protein_agent.get_tryptic_peptide_no(residue_position) + "</td>";
                     output += "<th scope=\"row\">"+ value['ID'] + "</th>";
                     output += "<td>"+ value['NMER'] + "</td>";
@@ -50,19 +43,93 @@ var ptmprofiler = {
 
         
         }
-        set_data(data){
-            this.data = data;
-
-        }
         select_phosphosites_data(ltp, htp,protein_agent, sequence_viewer){
-            console.log(this.data);
-            jQuery.each(this.data, function(key, value){
-                if(value['HTP'] > htp || value['LTP'] > ltp){
-                    protein_agent.selected[value['ID'].substring(1)] = true;
+            var data = JSON.parse(document.getElementById("phosphosite-data").value);
+            jQuery.each(data, function(key, value){
+                var curresidue = value['ID'].charAt(0);
+                var residue_position = value['ID'].substring(1);
+                if(enabled_resides.includes(curresidue)){
+                    if((value['HTP'] > htp) || (value['LTP'] > ltp)){
+                        sequence_viewer.select_residue(value['ID'].substring(1) - 1);
 
+                    }
                 }
             });
-            sequence_viewer.draw();
+
+        }
+
+        filter_on_tryptic(filter, protein_agent, sequence_viewer){
+            var data = JSON.parse(document.getElementById("phosphosite-data").value);
+            var prev_peptide = 0;
+
+            var tryptic_peptides = protein_agent.tryptic_peptides;
+            tryptic_peptides.push(protein_agent.protein_length);
+
+            for(let peptide in tryptic_peptides ){
+                var ST_max = 0;
+                var Y_max = 0;
+                var peptide_position = tryptic_peptides[peptide];
+
+                //Get max for current peptide
+                jQuery.each(data, function(key, value){
+                    var residue_position = value['ID'].substring(1);
+                    var curresidue = value['ID'].charAt(0);
+
+                    if((residue_position >= prev_peptide) && (residue_position < peptide_position)){
+                        if(curresidue =='Y'){
+                            if(Y_max < value['HTP']){
+                                Y_max = value['HTP'];
+                            }
+
+                        }
+                        else if(curresidue == 'S' || curresidue == 'T'){
+                            if(ST_max < value['HTP']){
+                                ST_max = value['HTP'];
+                            }
+
+                        }
+                    }
+                    else{
+                        if(residue_position < peptide_position){
+                        return;
+                        }
+                    }
+                });
+
+                    //Loop again but make deselections
+                    var Y_filter = filter * Y_max;
+                    var ST_filter = filter * ST_max;
+
+                    jQuery.each(data, function(key, value){
+                        var residue_position = value['ID'].substring(1);
+                        var curresidue = value['ID'].charAt(0);
+    
+                        if(residue_position >= prev_peptide && residue_position < peptide_position){
+                            if(curresidue == 'Y'){
+                                if(Y_filter > value['HTP']){
+                                    sequence_viewer.deselect_residue(residue_position - 1);
+                                }
+    
+                            }
+                            else if(curresidue == 'S' || curresidue == 'T'){
+                                if(ST_filter > value['HTP']){
+                                    sequence_viewer.deselect_residue(residue_position - 1);
+                                }
+    
+                            }
+                        }
+                        else{
+                            if(residue_position < peptide_position){
+                            return;
+                            }
+                        }
+
+
+                });
+
+                prev_peptide = peptide_position;
+            }
+
         }
     },
 
@@ -75,6 +142,7 @@ var ptmprofiler = {
             this.selected.fill(false);
             this.tryptic_peptides = this.get_tryptic_peptides();
             this.typtic_peptide_colors = this.get_tryptic_peptide_colors();
+            this.phosphosite = null;
     
         }
 
@@ -199,9 +267,17 @@ var ptmprofiler = {
         highlight_residue(residue_number){
             if (protein_agent.selected[residue_number]){
                 document.getElementById('seq-view-res-'+residue_number).style = "background-color: red";
+                if(document.getElementById('phosphosite-row-' + residue_number)){
+                    document.getElementById('phosphosite-row-' + residue_number).style = "background-color: #DDDDDD";
+
+                }
             }
             else{
                 document.getElementById('seq-view-res-'+residue_number).style = "background-color: none";
+                if(document.getElementById('phosphosite-row-' + residue_number)){
+                    document.getElementById('phosphosite-row-' + residue_number).style = "background-color: none";
+
+                }
             }
         }
 

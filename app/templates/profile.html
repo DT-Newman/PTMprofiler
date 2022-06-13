@@ -27,8 +27,23 @@
     <input type='hidden' id='phosphosite-data' value = "" />
 
     <div = id="phophosite-controls">
-      <div>Select phosphosites with more than LTP: <input type="number" class="form-control  input-sm col-lg-1" id="phosphosite-ltp" placeholder="4"> , HTP: <input type="number" class="form-control" id="phosphosite-htp" placeholder="0"> hits. <button type="button" class="btn btn-outline-success" onclick="select_phosphosites()" >Select sites</button> </div>
+      <div>Select phosphosites with more than LTP: <input type="number" class="form-control form-control-inline " id="phosphosite-ltp" value="0"> , HTP: <input type="number" class="form-control form-control-inline" id="phosphosite-htp" value="4"> hits. <button type="button" class="btn btn-outline-success" onclick="select_phosphosites()" >Select sites</button> </div>
     </div>
+
+    <div class="accordion" id="phosphosite-advanced">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              Advanced filters
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#phosphosite-advanced">
+          <div class="accordion-body">
+            Filter phosphosites are identified in less than <input type="number" class="form-control form-control-inline input-sm col-lg-1" id="phosphosite-tryptic-filter" value="0.4"> LTP experiments  of the tryptic peptide max  <button type="button" class="btn btn-outline-danger" onclick="phosphosite_tryptic_filter()" >Filter</button> 
+          </div>
+        </div>
+      </div>
+      </div>
 
     <div style="overflow-wrap: break-word;" id="phosphosite-viewer">
 
@@ -79,7 +94,7 @@
 
     <div>
       <label for="exampleInputEmail1">Min netphorest score</label>
-      <input type="number" class="form-control" id="netphorest-min-score" placeholder="0.1">
+      <input type="number" class="form-control form-control-inline" id="netphorest-min-score" value="0.1">
     
     </div>
     <button type="button" class="btn btn-outline-success" onclick="draw_netphorest()" >Get netphorest</button>
@@ -119,7 +134,7 @@
 
     <div>
       <label for="exampleInputEmail1">Min networkin score</label>
-      <input type="number" class="form-control" id="networkin-min-score" placeholder="2.0">
+      <input type="number" class="form-control form-control-inline" id="networkin-min-score" value="2.0">
     
     </div>
     <button type="button" class="btn btn-outline-success" onclick="draw_networkin()" >Get networkin</button>
@@ -179,6 +194,12 @@
     var ltp = document.getElementById("phosphosite-ltp").value;
 
     phosphosite.select_phosphosites_data(ltp, htp, protein_agent, sequence_viewer);
+
+  }
+
+  function phosphosite_tryptic_filter(){
+    var filterno = document.getElementById("phosphosite-tryptic-filter").value;
+    phosphosite.filter_on_tryptic(filterno, protein_agent, sequence_viewer);
 
   }
 
