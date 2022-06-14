@@ -6,7 +6,7 @@ The project itself has also served as a useful way for me to learn about the bas
 
 ## Running a local instance via uvicorn
 
-This option is good from running the code on your own machine for yourself or from development of ptmprofiler.
+This option is good from running the code on your own machine for yourself or for the development of ptmprofiler.
 
 You will need to have python 3.10 or above aswell as having fastapi and uvicorn installed. A full list of dependencies is contained within requirements.txt
 
