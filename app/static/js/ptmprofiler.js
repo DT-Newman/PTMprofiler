@@ -217,6 +217,7 @@ var ptmprofiler = {
     sequence_viewer: class{
         selectable_residues = enabled_resides;
         constructor(protein_agent, htmlclass, settings){
+            this.protein_agent = protein_agent;
             this.sequence = protein_agent.sequence;
             this.residue_number = this.sequence.length;
             this.htmlclass = htmlclass;
@@ -279,6 +280,7 @@ var ptmprofiler = {
 
                 }
             }
+            this.draw_sty_pie();
         }
 
         sequence_highlight(){
@@ -308,6 +310,39 @@ var ptmprofiler = {
             document.getElementById('entry_name').innerHTML = entry_object['entry'];
 
         }
+
+        get_num_of_residue(residue){
+            var total = 0;
+            for(var i=0; i < this.residue_number; i++){
+                if(this.sequence.charAt(i) == residue && this.protein_agent.selected[i]){
+                    total++;
+
+                }
+
+            }
+            return total;
+
+        }
+
+        draw_sty_pie(){
+            
+            
+            var data = [{
+                name: "S",
+                value: this.get_num_of_residue("S"),
+            },
+            {
+                name: "T",
+                value: this.get_num_of_residue("T"),
+            },
+            {
+                name: "Y",
+                value: this.get_num_of_residue("Y"),
+            },
+        ];
+        
+        }
+        
 
     },
     resmali: class{
