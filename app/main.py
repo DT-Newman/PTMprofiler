@@ -11,12 +11,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.encoders import jsonable_encoder
 from fastapi import Request
-
-
-
 import numpy as np
 import pandas as pd
-
+import resmali
 
 #LOCAL IMPORTS
 #ensure that PTMprofile is added to the local directory
@@ -26,7 +23,6 @@ parentDirectory = os.path.dirname(fileDirectory)
 sys.path.append(parentDirectory)
 
 from ptmprofiler import uniprot as uniprot
-from ptmprofiler.reSMALI import reSMALI
 import ptmprofiler.phosphosite as phosphosite
 from ptmprofiler import netphorest as netphorest
 from ptmprofiler import networkin as networkin
@@ -90,10 +86,9 @@ def phosphosite_webscrape(uniprot):
 
 
 #RESMALI
-
 @app.get('/api/resmali/condensed/{sequence}')
 def resmali_condensed(sequence):
-    result = reSMALI.condensedList(sequence)
+    result = resmali.condensed_list(sequence)
     result_dict = dict()
     for item in result:
         result_dict[str(item[0])] = item[1]
@@ -119,15 +114,3 @@ def networkin_full(entry):
 def protein_cutter(enzyme, sequence):
     peptide_list = pc.get_peptide_list(sequence, enzyme)
     return jsonable_encoder(peptide_list)
-
-@app.get('/test/{entry}', response_class=HTMLResponse)
-def test(request: Request, entry: str):
-    entry_dict = {
-         'entry' : entry,
-         'gene_name' : uniprot.get_primary_gene_name_from_api(entry),
-         'sequence' : uniprot.get_main_isoform_sequence(entry),
-     }
-    string_id = uniprot.get_string_from_entry(entry)
-    netphorest.get_netphorest(netphorest_df, string_id, "3")
-    return templates.TemplateResponse('test.html', {"request":request, "entry_dict":jsonable_encoder(entry_dict)})
-    #"gene_name":uniprot.get_primary_gene_name_from_api(entry), "sequence": uniprot.get_main_isoform_sequence(entry)}
